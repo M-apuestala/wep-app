@@ -99,6 +99,11 @@ const App = () => {
       return;
     }
 
+    if (!supabase) {
+      mostrarFeedback('error', '❌ Supabase no está configurado correctamente en el despliegue. Verifica las variables de entorno.');
+      return;
+    }
+
     setGuardando(true);
     try {
       // Guardar en la Base de Datos de Supabase
