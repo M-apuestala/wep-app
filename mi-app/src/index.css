@@ -1,0 +1,124 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #e2e8f0;
+  background: #0f172a;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100vh;
+}
+
+body {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-container {
+  min-height: 100vh;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.interface-screen {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+header,
+section,
+footer {
+  border-radius: 1rem;
+}
+
+section {
+  background: #111827;
+  border: 1px solid #334155;
+  padding: 1rem;
+}
+
+header {
+  padding: 1rem;
+  border-bottom: 1px solid #334155;
+  background: rgba(15, 23, 42, 0.95);
+}
+
+button {
+  border: none;
+  border-radius: 0.85rem;
+  padding: 0.9rem 1rem;
+  background: #10b981;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+button[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+input[type='text'] {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid #334155;
+  background: #111827;
+  color: #e2e8f0;
+}
+
+#lector-qr {
+  min-height: 220px;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #000;
+}
+
+.print-only-ticket {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .app-container,
+  .interface-screen {
+    display: none !important;
+  }
+  .print-only-ticket {
+    display: block !important;
+    width: 54mm;
+    padding: 5mm;
+    background: #fff;
+    color: #000;
+    font-family: monospace;
+    font-size: 10pt;
+  }
+}
