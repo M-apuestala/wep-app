@@ -1,12 +1,8 @@
-import { createClient } from '@supabase/supabase-js'
+// src/supabaseClient.js
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en el archivo .env.local en la raíz del proyecto.')
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-export { supabase }   
+// Pon "export" justo antes de "const"
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
