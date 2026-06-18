@@ -220,16 +220,16 @@ const Dashboard = () => {
             @page { size: A4 portrait; margin: 0; }
             html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
             body { font-family: Courier, monospace; margin: 0; padding: 0; background: #fff; }
-            .ticket { width: 100%; height: 100%; box-sizing: border-box; padding: 24mm 20mm; display: flex; flex-direction: column; justify-content: space-between; }
-            .logo { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 18mm; }
-            .logo-mark { width: 76px; height: 76px; border-radius: 18px; background: #0f172a; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; }
+            .ticket { width: 100%; height: 100%; box-sizing: border-box; padding: 22mm 18mm; display: flex; flex-direction: column; justify-content: space-between; }
+            .logo { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 18mm; }
+            .logo-mark { width: 120px; height: 120px; border-radius: 18px; background: #0f172a; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; }
             .logo-text { text-align: center; }
-            .logo-text h1 { margin: 0; font-size: 32px; letter-spacing: 0.13em; }
-            .logo-text p { margin: 4px 0 0; font-size: 12px; letter-spacing: 0.18em; }
-            .details { width: 100%; display: grid; gap: 10px; font-size: 12pt; line-height: 1.5; }
+            .logo-text h1 { margin: 0; font-size: 54px; letter-spacing: 0.09em; }
+            .logo-text p { margin: 8px 0 0; font-size: 22px; letter-spacing: 0.16em; }
+            .details { width: 100%; display: grid; gap: 18px; font-size: 20pt; line-height: 1.5; max-width: 72%; margin: 0 auto; }
             .details .row { display: flex; justify-content: space-between; }
-            .divider { border-bottom: 1px solid #000; margin: 9px 0; }
-            .footer { text-align: center; margin-top: 18mm; font-size: 10pt; line-height: 1.4; }
+            .divider { border-bottom: 1px solid #000; margin: 16px 0; }
+            .footer { text-align: center; margin-top: 18mm; font-size: 14pt; line-height: 1.5; }
           </style>
         </head>
         <body>
@@ -241,27 +241,29 @@ const Dashboard = () => {
                 <path d="M44 62L60 42L76 62" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
               <div class="logo-text">
-                <h1>APUESTALA</h1>
-                <p>BANCA LA REFORMA</p>
+                <h1 style="font-size: 62px;">APUESTALA</h1>
+                <p style="font-size: 26px;">BANCA LA REFORMA</p>
               </div>
             </div>
-            <div style="text-align:center; margin-bottom: 16mm; font-size: 18px; font-weight: 700;">TICKET HÍPICO</div>
-            <div class="details">
-              <div class="row"><span>Ticket:</span><span>${apuesta.ticketId}</span></div>
-              <div class="row"><span>Fecha:</span><span>${apuesta.fecha} ${apuesta.hora}</span></div>
-              <div class="row"><span>Taquilla:</span><span>${apuesta.taquilla}</span></div>
+            <div style="text-align:center; margin-bottom: 16mm; font-size: 44px; font-weight: 900;">TICKET HÍPICO</div>
+            <div style="font-size: 26px; color: #333; margin-top: 6px;">Formato A4 completo y de gran tamaño</div>
+          </div>
+          <div class="details" style="font-size: 22pt; gap: 18px; max-width: 72%; margin: 0 auto;">
+              <div class="row" style="font-size: 26pt;"><span>Ticket:</span><span>${apuesta.ticketId}</span></div>
+              <div class="row" style="font-size: 24pt;"><span>Fecha:</span><span>${apuesta.fecha} ${apuesta.hora}</span></div>
+              <div class="row" style="font-size: 24pt;"><span>Taquilla:</span><span>${apuesta.taquilla}</span></div>
               <div class="divider"></div>
-              <div class="row" style="font-weight:700;"><span>HIPÓDROMO:</span><span>${apuesta.hipodromo}</span></div>
+              <div class="row" style="font-weight:700; font-size: 26pt;"><span>HIPÓDROMO:</span><span>${apuesta.hipodromo}</span></div>
               <div class="divider" style="border-style:dashed;"></div>
-              <div class="row"><span>Carrera:</span><span>${apuesta.carrera}</span></div>
-              <div class="row"><span>Tipo:</span><span>${apuesta.tipo}</span></div>
-              <div class="row"><span>Ejemplar:</span><span>${apuesta.ejemplar}</span></div>
+              <div class="row" style="font-size: 24pt;"><span>Carrera:</span><span>${apuesta.carrera}</span></div>
+              <div class="row" style="font-size: 24pt;"><span>Tipo:</span><span>${apuesta.tipo}</span></div>
+              <div class="row" style="font-size: 24pt;"><span>Ejemplar:</span><span>${apuesta.ejemplar}</span></div>
               <div class="divider"></div>
-              <div class="row"><span>Monto:</span><span>$${apuesta.monto}</span></div>
+              <div class="row" style="font-size: 34pt; font-weight: 900;"><span>Monto:</span><span>$${apuesta.monto}</span></div>
             </div>
             <div style="text-align:center; margin-top: auto;">
-              <div style="font-size: 14px; font-weight: 700;">CÓDIGO DE CONTROL</div>
-              <div style="margin: 10px 0 0; font-size: 13pt; font-weight: 700;">*${apuesta.codigoControl}*</div>
+              <div style="font-size: 22px; font-weight: 900;">CÓDIGO DE CONTROL</div>
+              <div style="margin: 14px 0 0; font-size: 28pt; font-weight: 900;">*${apuesta.codigoControl}*</div>
             </div>
             <div class="footer">
               <div>* Caduca en 30 días.</div>
