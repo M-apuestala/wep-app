@@ -217,8 +217,11 @@ const Dashboard = () => {
           <meta charset="utf-8" />
           <title>Ticket Hípico</title>
           <style>
-            body { font-family: Courier, monospace; margin: 0; padding: 6mm 4mm; }
-            .ticket { width: 54mm; }
+            @page { size: A4 portrait; margin: 12mm; }
+            html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+            body { font-family: Courier, monospace; margin: 0; padding: 12mm; background: #fff; }
+            .ticket { width: 100%; max-width: 100%; box-sizing: border-box; }
+            .ticket hr { border: none; border-top: 1px solid #000; margin: 12px 0; }
           </style>
         </head>
         <body>
@@ -241,7 +244,7 @@ const Dashboard = () => {
       </html>
     `;
 
-    const w = window.open('', '_blank', 'width=400,height=600');
+    const w = window.open('', '_blank', 'width=1000,height=800');
     if (!w) {
       mostrarFeedback('error', '❌ Bloqueador de popups bloqueó la ventana de impresión.');
       return;

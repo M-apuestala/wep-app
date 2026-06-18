@@ -35,7 +35,7 @@ const TicketHipismoPrint = () => {
   // Minimal standalone ticket markup for clean printing (dynamic)
   return (
     <div>
-      <div id="ticket-hipico-termico" style={{ padding: '6mm 4mm', boxSizing: 'border-box', background: '#fff', color: '#000', width: '54mm', fontFamily: 'Courier, monospace' }}>
+      <div id="ticket-hipico-termico" style={{ padding: '12mm', boxSizing: 'border-box', background: '#fff', color: '#000', width: '100%', maxWidth: '100%', fontFamily: 'Courier, monospace' }}>
         <div style={{ textAlign: 'center', fontWeight: 700, marginBottom: 6 }}>BANCA LA REFORMA</div>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>- Apuestas Hípicas -</div>
         <div style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
@@ -79,11 +79,12 @@ const TicketHipismoPrint = () => {
 
       <style>{`
         @media print {
-          @page { size: 58mm auto; margin: 0; }
+          @page { size: A4 portrait; margin: 12mm; }
+          html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
           body { background: #fff; }
           body * { visibility: hidden; }
           #ticket-hipico-termico, #ticket-hipico-termico * { visibility: visible; }
-          #ticket-hipico-termico { position: absolute; left: 0; top: 0; }
+          #ticket-hipico-termico { position: relative; left: 0; top: 0; width: 100%; max-width: 100%; }
         }
       `}</style>
     </div>
