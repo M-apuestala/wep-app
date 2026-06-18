@@ -8,7 +8,31 @@ const TicketHipismoPrint = () => {
     return () => clearTimeout(t);
   }, []);
 
-  // Minimal standalone ticket markup for clean printing
+  // Read the last printed ticket from sessionStorage
+  let ticket = null;
+  try {
+    const raw = sessionStorage.getItem('lastPrintedTicket');
+    ticket = raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.warn('No se pudo parsear lastPrintedTicket', e);
+    ticket = null;
+  }
+
+  const use = ticket || {
+    ticketId: '#A987654321',
+    fecha: '18/06/2026',
+    hora: '17:05',
+    taquilla: 'TQ-04',
+    hipodromo: 'LA RINCONADA',
+    carrera: '5',
+    tipo: 'GANADOR',
+    ejemplar: '#04 PAPÁ PEDRO',
+    monto: '10.00',
+    premio: '35.00',
+    codigoControl: 'X89J-23LK-P90W'
+  };
+
+  // Minimal standalone ticket markup for clean printing (dynamic)
   return (
     <div>
       <div id="ticket-hipico-termico" style={{ padding: '6mm 4mm', boxSizing: 'border-box', background: '#fff', color: '#000', width: '54mm', fontFamily: 'Courier, monospace' }}>
@@ -17,32 +41,32 @@ const TicketHipismoPrint = () => {
         <div style={{ borderTop: '1px dashed #000', margin: '6px 0' }} />
 
         <div style={{ fontFamily: 'Courier, monospace', fontSize: '9pt' }}>
-          <div>Ticket: #A987654321</div>
-          <div>Fecha: 18/06/2026  Hora: 17:05</div>
-          <div>Taquilla: TQ-04</div>
+          <div>Ticket: {use.ticketId}</div>
+          <div>Fecha: {use.fecha}  Hora: {use.hora}</div>
+          <div>Taquilla: {use.taquilla}</div>
           <div>--------------------------------</div>
-          <div style={{ fontWeight: 700 }}>HIPÓDROMO: LA RINCONADA</div>
+          <div style={{ fontWeight: 700 }}>HIPÓDROMO: {use.hipodromo}</div>
           <div>--------------------------------</div>
-          <div>Carrera: 5  | Tipo: GANADOR</div>
+          <div>Carrera: {use.carrera}  | Tipo: {use.tipo}</div>
           <div>Ejemplar(es):</div>
-          <div>  &gt; #04 PAPÁ PEDRO</div>
+          <div>  &gt; {use.ejemplar}</div>
           <div>--------------------------------</div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Monto Jugado:</span>
-            <span>$10.00</span>
+            <span>${use.monto}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span>Premio Potencial:</span>
-            <span>$35.00</span>
+            <span>${use.premio}</span>
           </div>
           <div>--------------------------------</div>
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 8 }}>
           <div>CÓDIGO DE CONTROL</div>
-          <div style={{ fontWeight: 700 }}>*X89J-23LK-P90W*</div>
+          <div style={{ fontWeight: 700 }}>*{use.codigoControl}*</div>
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
-            <QRCodeSVG value="X89J-23LK-P90W" size={90} level="M" includeMargin={false} fgColor="#000000" />
+            <QRCodeSVG value={use.codigoControl} size={90} level="M" includeMargin={false} fgColor="#000000" />
           </div>
         </div>
 
