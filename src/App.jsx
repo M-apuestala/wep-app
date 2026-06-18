@@ -217,28 +217,57 @@ const Dashboard = () => {
           <meta charset="utf-8" />
           <title>Ticket Hípico</title>
           <style>
-            @page { size: A4 portrait; margin: 12mm; }
+            @page { size: A4 portrait; margin: 0; }
             html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
-            body { font-family: Courier, monospace; margin: 0; padding: 12mm; background: #fff; }
-            .ticket { width: 100%; max-width: 100%; box-sizing: border-box; }
-            .ticket hr { border: none; border-top: 1px solid #000; margin: 12px 0; }
+            body { font-family: Courier, monospace; margin: 0; padding: 0; background: #fff; }
+            .ticket { width: 100%; height: 100%; box-sizing: border-box; padding: 24mm 20mm; display: flex; flex-direction: column; justify-content: space-between; }
+            .logo { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 18mm; }
+            .logo-mark { width: 76px; height: 76px; border-radius: 18px; background: #0f172a; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 28px; letter-spacing: 0.08em; }
+            .logo-text { text-align: center; }
+            .logo-text h1 { margin: 0; font-size: 32px; letter-spacing: 0.13em; }
+            .logo-text p { margin: 4px 0 0; font-size: 12px; letter-spacing: 0.18em; }
+            .details { width: 100%; display: grid; gap: 10px; font-size: 12pt; line-height: 1.5; }
+            .details .row { display: flex; justify-content: space-between; }
+            .divider { border-bottom: 1px solid #000; margin: 9px 0; }
+            .footer { text-align: center; margin-top: 18mm; font-size: 10pt; line-height: 1.4; }
           </style>
         </head>
         <body>
           <div class="ticket">
-            <div style="text-align:center;font-weight:700;">BANCA LA REFORMA</div>
-            <div style="text-align:center;">- Apuestas Hípicas -</div>
-            <hr/>
-            <div>Ticket: ${apuesta.ticketId}</div>
-            <div>Fecha: ${apuesta.fecha} Hora: ${apuesta.hora}</div>
-            <div>Taquilla: ${apuesta.taquilla}</div>
-            <div>--------------------------------</div>
-            <div style="font-weight:700">HIPÓDROMO: ${apuesta.hipodromo}</div>
-            <div>Carrera: ${apuesta.carrera} | Tipo: ${apuesta.tipo}</div>
-            <div>Ejemplar: ${apuesta.ejemplar}</div>
-            <div>--------------------------------</div>
-            <div style="display:flex;justify-content:space-between;"><span>Monto:</span><span>$${apuesta.monto}</span></div>
-            <div style="text-align:center;margin-top:8px;">CÓDIGO: ${apuesta.codigoControl}</div>
+            <div class="logo">
+              <svg width="76" height="76" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Apuestala">
+                <rect width="120" height="120" rx="24" fill="#0f172a" />
+                <path d="M34 42L60 82L86 42" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M44 62L60 42L76 62" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <div class="logo-text">
+                <h1>APUESTALA</h1>
+                <p>BANCA LA REFORMA</p>
+              </div>
+            </div>
+            <div style="text-align:center; margin-bottom: 16mm; font-size: 18px; font-weight: 700;">TICKET HÍPICO</div>
+            <div class="details">
+              <div class="row"><span>Ticket:</span><span>${apuesta.ticketId}</span></div>
+              <div class="row"><span>Fecha:</span><span>${apuesta.fecha} ${apuesta.hora}</span></div>
+              <div class="row"><span>Taquilla:</span><span>${apuesta.taquilla}</span></div>
+              <div class="divider"></div>
+              <div class="row" style="font-weight:700;"><span>HIPÓDROMO:</span><span>${apuesta.hipodromo}</span></div>
+              <div class="divider" style="border-style:dashed;"></div>
+              <div class="row"><span>Carrera:</span><span>${apuesta.carrera}</span></div>
+              <div class="row"><span>Tipo:</span><span>${apuesta.tipo}</span></div>
+              <div class="row"><span>Ejemplar:</span><span>${apuesta.ejemplar}</span></div>
+              <div class="divider"></div>
+              <div class="row"><span>Monto:</span><span>$${apuesta.monto}</span></div>
+            </div>
+            <div style="text-align:center; margin-top: auto;">
+              <div style="font-size: 14px; font-weight: 700;">CÓDIGO DE CONTROL</div>
+              <div style="margin: 10px 0 0; font-size: 13pt; font-weight: 700;">*${apuesta.codigoControl}*</div>
+            </div>
+            <div class="footer">
+              <div>* Caduca en 30 días.</div>
+              <div>* Revise su ticket. No se aceptan reclamos posteriores.</div>
+              <div>================================</div>
+            </div>
           </div>
         </body>
       </html>
@@ -312,9 +341,18 @@ const Dashboard = () => {
     <div className="app-root">
       <div className="topbar">
         <div className="topbar-left">
-          <div>
-            <p className="eyebrow">Deploy 12</p>
-            <h1 className="title">Apuestala POS Dashboard</h1>
+          <div className="brand-header">
+            <div className="brand-mark">
+              <svg width="36" height="36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Apuestala">
+                <rect width="120" height="120" rx="24" fill="#0f172a" />
+                <path d="M34 42L60 82L86 42" stroke="#fff" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M44 62L60 42L76 62" stroke="#fff" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <p className="eyebrow">Deploy 12</p>
+              <h1 className="title">Apuestala POS Dashboard</h1>
+            </div>
           </div>
         </div>
 
