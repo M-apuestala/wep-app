@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { Link } from 'react-router-dom';
 
 const TicketHipismo = () => {
   const [apuesta, setApuesta] = useState({
@@ -22,11 +23,17 @@ const TicketHipismo = () => {
 
   return (
     <div className="ticket-hipismo-shell">
-      <h2 className="ticket-hipismo-title">
-        🎟️ Generador de Ticket Hípico
-      </h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
+        <div>
+          <h2 className="ticket-hipismo-title">🎟️ Generador de Ticket Hípico</h2>
+          <p style={{ color: '#cbd5e1', marginTop: '6px' }}>Página React interna del dashboard.</p>
+        </div>
+        <Link to="/" className="pill-button" style={{ marginLeft: 'auto' }}>
+          Volver al Dashboard
+        </Link>
+      </div>
 
-      <div className="ticket-hipismo-form grid-cols-2">
+      <div className="ticket-hipismo-form">
         <div className="ticket-field">
           <label>Hipódromo</label>
           <input
