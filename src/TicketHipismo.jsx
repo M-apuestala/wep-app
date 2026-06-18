@@ -210,6 +210,12 @@ const TicketHipismo = () => {
             visibility: hidden !important;
           }
 
+          .ticket-hipismo-shell,
+          .ticket-hipismo-shell * {
+            display: block !important;
+            visibility: visible !important;
+          }
+
           #ticket-hipico-termico,
           #ticket-hipico-termico * {
             display: block !important;

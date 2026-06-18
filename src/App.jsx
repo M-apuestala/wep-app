@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import TicketHipismo from './TicketHipismo.jsx';
+import TicketHipismoPrint from './TicketHipismoPrint.jsx';
 import { supabase } from './supabaseClient.js';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
@@ -125,9 +126,9 @@ const Dashboard = () => {
           <button
             type="button"
             className="pill-button"
-            onClick={() => window.open('/#/ticket-hipico', '_blank')}
+            onClick={() => window.open('/#/print/ticket-hipico', '_blank')}
           >
-            Abrir Ticket Hípico
+            Abrir Ticket Hípico (Imprimir)
           </button>
         </div>
       </div>
@@ -165,8 +166,8 @@ const Dashboard = () => {
               </div>
 
               <div className="header-actions" style={{ marginTop: '20px', gap: '12px', flexWrap: 'wrap' }}>
-                <button className="pill-button" type="button" onClick={() => window.open('/#/ticket-hipico', '_blank')}>
-                  Ticket Hípico
+                <button className="pill-button" type="button" onClick={() => window.open('/#/print/ticket-hipico', '_blank')}>
+                  Ticket Hípico (Imprimir)
                 </button>
                 <button className="pill-button" type="button" onClick={procesarEImprimirTicket} disabled={guardando}>
                   {guardando ? 'Guardando...' : 'Imprimir ticket'}
