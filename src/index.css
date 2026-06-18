@@ -88,18 +88,12 @@ img {
 }
 
 .topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  height: 72px;
+  width: 100%;
   padding: 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(30, 16, 15, 0.92);
-  backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(91, 64, 63, 0.1);
 }
 
@@ -141,6 +135,7 @@ img {
   background: rgba(74, 222, 128, 0.12);
   color: #c7f1d6;
   font-size: 0.9rem;
+  min-width: 0;
 }
 
 .status-dot {
@@ -151,7 +146,6 @@ img {
 }
 
 .main-content {
-  margin-top: 72px;
   padding: 24px;
   max-width: 1440px;
   margin-left: auto;
@@ -176,6 +170,12 @@ img {
   align-items: flex-end;
   gap: 24px;
   margin-bottom: 32px;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .eyebrow {
@@ -216,6 +216,35 @@ img {
   grid-template-columns: 2fr 1fr;
   gap: 24px;
   margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+  .main-content {
+    padding: 20px;
+  }
+  .topbar {
+    padding: 0 16px;
+    min-height: auto;
+  }
+  .header-row {
+    align-items: flex-start;
+  }
+  .status-pill {
+    width: 100%;
+    justify-content: center;
+  }
+  .pill-button {
+    width: 100%;
+  }
+  .action-row {
+    grid-template-columns: 1fr;
+  }
+  .scanner-stage {
+    min-height: 280px;
+  }
 }
 
 .grid-left,
