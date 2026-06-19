@@ -386,8 +386,86 @@ const Dashboard = () => {
               <span className="material-symbols-outlined">refresh</span>
               Refrescar
             </button>
+            <button className="button-secondary" type="button" onClick={() => setShowSupabaseConfig((prev) => !prev)}>
+              <span className="material-symbols-outlined">storage</span>
+              Supabase
+            </button>
           </div>
-        </section>
+
+          {showSupabaseConfig && (
+            <section className="bento-card compact-card db-config-card">
+              <div className="panel-heading">
+                <div className="panel-icon">
+                  <span className="material-symbols-outlined">storage</span>
+                </div>
+                <div>
+                  <h4>Configuración Supabase</h4>
+                </div>
+              </div>
+              <div className="input-group">
+                <input
+                  placeholder="URL de Supabase"
+                  type="text"
+                  value={supabaseUrlInput}
+                  onChange={(e) => setSupabaseUrlInput(e.target.value)}
+                />
+              </div>
+              <div className="input-group">
+                <input
+                  placeholder="Anon Key de Supabase"
+                  type="password"
+                  value={supabaseKeyInput}
+                  onChange={(e) => setSupabaseKeyInput(e.target.value)}
+                />
+              </div>
+              <div className="db-actions">
+                <button className="button-secondary" type="button" onClick={async () => {
+                  if (!supabaseUrlInput || !supabaseKeyInput) {
+                    mostrarFeedback('error', 'Rellena URL y Anon Key para conectar.');
+                    return;
+                  }
+                  initSupabase(supabaseUrlInput.trim(), supabaseKeyInput.trim(), true);
+                  const res = await testSupabaseConnection();
+                  setSupabaseStatus({ ok: !!res.ok, detail: res.error || null });
+                  if (res.ok) mostrarFeedback('success', 'Supabase conectado correctamente.');
+                  else mostrarFeedback('error', 'Error al conectar: ' + (res.error || 'sin respuesta'));
+                }}>
+                  <span className="material-symbols-outlined">check_circle</span>
+                  Guardar y probar
+                </button>
+                <button className="button-outline" type="button" onClick={() => {
+                  clearSupabaseConfig();
+                  setSupabaseUrlInput('');
+                  setSupabaseKeyInput('');
+                  setSupabaseStatus({ ok: false, detail: 'configuración borrada' });
+                  mostrarFeedback('info', 'Configuración de Supabase eliminada.');
+                }}>
+                  <span className="material-symbols-outlined">delete</span>
+                  Borrar config
+                </button>
+              </div>
+              <div className="summary-row summary-row--muted" style={{ marginTop: 18, display: 'grid', gap: 10 }}>
+                <div><strong>URL actual:</strong> {supabaseUrlInput || 'No configurada'}</div>
+                <div><strong>Anon key:</strong> {supabaseKeyInput ? 'Ingresada' : 'No ingresada'}</div>
+                <div><strong>Conexión:</strong> {supabaseStatus.ok ? 'Conectado' : supabaseStatus.detail || 'No conectado'}</div>
+              </div>
+              <div className="db-actions" style={{ marginTop: 18, display: 'grid', gap: 12 }}>
+                <div className="input-group" style={{ margin: 0 }}>
+                  <label className="eyebrow" style={{ marginBottom: 10 }}>Auto-save</label>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button className={`button-secondary ${autoSaveEnabled ? '' : 'button-outline'}`} type="button" onClick={() => setAutoSaveEnabled(true)}>
+                      Activado
+                    </button>
+                    <button className={`button-secondary ${!autoSaveEnabled ? '' : 'button-outline'}`} type="button" onClick={() => setAutoSaveEnabled(false)}>
+                      Desactivado
+                    </button>
+                    <span style={{ fontSize: '0.9rem', color: 'rgba(249,220,218,0.8)' }}>Último auto-save: {lastAutoSaveAt ? new Date(lastAutoSaveAt).toLocaleTimeString() : 'Nunca'}</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+          </section>
 
         <div className="dashboard-grid">
           <div className="dashboard-main-panel">
@@ -414,6 +492,37 @@ const Dashboard = () => {
                 <span className="material-symbols-outlined">videocam</span>
                 ACTIVAR ESCÁNER
               </button>
+            </section>
+
+            <section className="bento-card compact-card">
+              <div className="panel-heading">
+                <div className="panel-icon">
+                  <span className="material-symbols-outlined">receipt_long</span>
+                </div>
+                <div>
+                  <h4>Resumen de captura</h4>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gap: '14px' }}>
+                <div className="summary-row summary-row--muted" style={{ display: 'grid', gap: '6px' }}>
+                  <div><strong>QR capturado:</strong> {datosTicket.qr || 'Ninguno'}</div>
+                  <div><strong>Banda magnética:</strong> {datosTicket.magnetico || 'Ninguna'}</div>
+                  <div><strong>Tag NFC:</strong> {datosTicket.nfc || 'Ninguno'}</div>
+                </div>
+                <div className="hero-actions" style={{ gap: 12, justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                  <button className="button-secondary" type="button" onClick={preSaveAndOpenPreview} disabled={!datosTicket.qr && !datosTicket.magnetico && !datosTicket.nfc}>
+                    <span className="material-symbols-outlined">preview</span>
+                    Vista previa
+                  </button>
+                  <button className="button-secondary" type="button" onClick={() => window.open('/#/print/ticket-hipico', '_blank')} disabled={!datosTicket.qr && !datosTicket.magnetico && !datosTicket.nfc}>
+                    <span className="material-symbols-outlined">print</span>
+                    Ticket Hípico
+                  </button>
+                  <button className="button-primary" type="button" onClick={procesarEImprimirTicket} disabled={guardando || (!datosTicket.qr && !datosTicket.magnetico && !datosTicket.nfc)}>
+                    {guardando ? 'Guardando...' : 'Imprimir ticket'}
+                  </button>
+                </div>
+              </div>
             </section>
 
             <section className="action-strip">
