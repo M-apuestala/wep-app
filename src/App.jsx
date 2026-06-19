@@ -60,29 +60,49 @@ const Dashboard = () => {
 
   useEffect(() => {
     let scanner = null;
+    let mounted = true;
 
-    if (escaneandoQR) {
-      scanner = new Html5QrcodeScanner('lector-qr', {
-        fps: 15,
-        qrbox: { width: 220, height: 220 },
-        rememberLastUsedCamera: true,
-        supportedScanTypes: [0]
-      }, false);
-
-      scanner.render(
-        (textoDecodificado) => {
-          setDatosTicket(prev => ({ ...prev, qr: textoDecodificado }));
-          mostrarFeedback('success', '📷 Código QR escaneado con éxito');
-          setEscaneandoQR(false);
-          scanner.clear();
-        },
-        (error) => {
-          console.debug('Buscando QR...', error);
+    const startScanner = async () => {
+      try {
+        console.log('[QR] iniciando scanner...');
+        mostrarFeedback('info', 'Iniciando cámara...');
+        const container = document.getElementById('lector-qr');
+        if (!container) {
+          mostrarFeedback('error', 'Contenedor del lector no encontrado');
+          return;
         }
-      );
-    }
+        // ensure container is empty
+        container.innerHTML = '';
+
+        scanner = new Html5QrcodeScanner('lector-qr', {
+          fps: 15,
+          qrbox: { width: 220, height: 220 },
+          rememberLastUsedCamera: true
+        }, false);
+
+        scanner.render(
+          (textoDecodificado) => {
+            if (!mounted) return;
+            console.log('[QR] decodificado:', textoDecodificado);
+            setDatosTicket(prev => ({ ...prev, qr: textoDecodificado }));
+            mostrarFeedback('success', '📷 Código QR escaneado con éxito');
+            setEscaneandoQR(false);
+            try { scanner.clear(); } catch (e) { /* ignore */ }
+          },
+          (error) => {
+            console.debug('[QR] buscando...', error);
+          }
+        );
+      } catch (err) {
+        console.error('[QR] error iniciando scanner', err);
+        mostrarFeedback('error', 'Error iniciando cámara: ' + (err.message || String(err)));
+      }
+    };
+
+    if (escaneandoQR) startScanner();
 
     return () => {
+      mounted = false;
       if (scanner) {
         scanner.clear().catch(err => console.error('Error destruyendo scanner', err));
       }
