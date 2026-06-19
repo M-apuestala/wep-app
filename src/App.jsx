@@ -9,6 +9,9 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 const Dashboard = () => {
   const [datosTicket, setDatosTicket] = useState({ qr: '', magnetico: '', nfc: '' });
   const [escaneandoQR, setEscaneandoQR] = useState(false);
+  const [flipX, setFlipX] = useState(false);
+  const [flipY, setFlipY] = useState(false);
+  const [rotate90, setRotate90] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [mensajeEstado, setMensajeEstado] = useState({ tipo: '', texto: '' });
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -368,9 +371,11 @@ const Dashboard = () => {
       </header>
 
       <main className="page-shell">
+        <div className="hero-top-centered">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBby3qyaYen6cS0lvzOxw9CXesT7C1sKKgCRNXaaBnv243dAr7rUtkCQHYVp-7SWCWfZ4hNXzlQ-x5smEdKY9EssXWFAfCOEToahQAQSYlzdgNRw4yO_MTwgA_mzBpmgKxVaNLlOnH8nMQD5IcsdIGSQ4bZgjcBveUJ8xyZP1BaGqhLdTtXQ89SeuAL6cVMvPzFYgCMRMqaex9dQ-oIyDYMBfmtvn2kwSbrpXePFO-wcB7RpmEzsZoTzPv5ZriHqs3xs1aEScQ4RUw5" alt="Apuestala Logo" className="hero-logo" />
+        </div>
         <section className="hero-card">
           <div className="hero-card-top">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBby3qyaYen6cS0lvzOxw9CXesT7C1sKKgCRNXaaBnv243dAr7rUtkCQHYVp-7SWCWfZ4hNXzlQ-x5smEdKY9EssXWFAfCOEToahQAQSYlzdgNRw4yO_MTwgA_mzBpmgKxVaNLlOnH8nMQD5IcsdIGSQ4bZgjcBveUJ8xyZP1BaGqhLdTtXQ89SeuAL6cVMvPzFYgCMRMqaex9dQ-oIyDYMBfmtvn2kwSbrpXePFO-wcB7RpmEzsZoTzPv5ZriHqs3xs1aEScQ4RUw5" alt="Apuestala Logo" className="hero-logo" />
             <div>
               <p className="eyebrow">Gestión de apuestas</p>
               <h2 className="hero-title">Terminal inteligente POS</h2>
@@ -503,6 +508,13 @@ const Dashboard = () => {
                   <h4>Resumen de captura</h4>
                 </div>
               </div>
+
+                    <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+                      <button className="pill-button" type="button" onClick={() => setFlipX(v => !v)}>{flipX ? 'FlipX ✓' : 'FlipX'}</button>
+                      <button className="pill-button" type="button" onClick={() => setFlipY(v => !v)}>{flipY ? 'FlipY ✓' : 'FlipY'}</button>
+                      <button className="pill-button" type="button" onClick={() => setRotate90(v => !v)}>{rotate90 ? 'Rot90 ✓' : 'Rot90'}</button>
+                      <button className="pill-button" type="button" onClick={() => { setFlipX(false); setFlipY(false); setRotate90(false); }}>Reset</button>
+                    </div>
               <div style={{ display: 'grid', gap: '14px' }}>
                 <div className="summary-row summary-row--muted" style={{ display: 'grid', gap: '6px' }}>
                   <div><strong>QR capturado:</strong> {datosTicket.qr || 'Ninguno'}</div>

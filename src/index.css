@@ -632,6 +632,13 @@ img {
   padding: 10px;
 }
 
+.hero-top-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
 .hero-title {
   margin: 0;
   font-size: 44px;
@@ -811,6 +818,29 @@ img {
   border-top: none;
   border-left: none;
 }
+
+/* scanner transforms for lector-qr */
+#lector-qr {
+  min-height: 260px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(30,16,15,0.6);
+}
+
+#lector-qr video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: transform 0.12s ease;
+}
+
+#lector-qr.flipX video { transform: scaleX(-1); }
+#lector-qr.flipY video { transform: scaleY(-1); }
+#lector-qr.rotate90 video { transform: rotate(90deg); }
+
+.scanner-controls { display: flex; gap: 8px; margin-top: 10px; }
 
 .action-strip {
   display: grid;
