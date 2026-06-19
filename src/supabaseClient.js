@@ -1,22 +1,50 @@
 // src/supabaseClient.js
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const ENV_SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const ENV_SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// runtime-configurable values (can be initialized from env or localStorage)
+let currentUrl = ENV_SUPABASE_URL || null;
+let currentKey = ENV_SUPABASE_ANON_KEY || null;
 let supabase = null;
 
-if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
-  console.warn('Supabase no está configurado: define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en las variables de entorno de Vercel.');
+const _createClient = (url, key) => {
+  try {
+    supabase = createClient(url, key);
+    return supabase;
+  } catch (err) {
+    console.warn('Error creando cliente Supabase:', err);
+    supabase = null;
+    return null;
+  }
+};
+
+// Prefer persisted config in localStorage for dev convenience
+try {
+  const persisted = localStorage.getItem('supabaseConfig');
+  if (persisted) {
+    const parsed = JSON.parse(persisted);
+    if (parsed?.url && parsed?.key) {
+      currentUrl = parsed.url;
+      currentKey = parsed.key;
+    }
+  }
+} catch (e) {
+  // ignore
 }
 
-const isSupabaseConfigured = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY && supabase);
+if (currentUrl && currentKey) {
+  _createClient(currentUrl, currentKey);
+} else {
+  console.warn('Supabase no está configurado: define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY o configura desde la UI.');
+}
+
+const isSupabaseConfigured = () => !!(currentUrl && currentKey && supabase);
 
 const getSupabaseSummary = () => ({
-  url: SUPABASE_URL || null,
-  anonKeySet: !!SUPABASE_ANON_KEY,
+  url: currentUrl || null,
+  anonKeySet: !!currentKey,
   configured: isSupabaseConfigured()
 });
 
@@ -61,4 +89,28 @@ const saveTicket = async (ticketFields) => {
   }
 };
 
-export { supabase, isSupabaseConfigured, getSupabaseSummary, testSupabaseConnection, saveTicket };
+// allow runtime initialization (useful for dev/testing without restarting the server)
+const initSupabase = (url, key, persist = false) => {
+  currentUrl = url || null;
+  currentKey = key || null;
+  if (currentUrl && currentKey) {
+    _createClient(currentUrl, currentKey);
+  } else {
+    supabase = null;
+  }
+  try {
+    if (persist) localStorage.setItem('supabaseConfig', JSON.stringify({ url: currentUrl, key: currentKey }));
+  } catch (e) {
+    // ignore
+  }
+  return isSupabaseConfigured();
+};
+
+const clearSupabaseConfig = () => {
+  try { localStorage.removeItem('supabaseConfig'); } catch (e) {}
+  currentUrl = null; currentKey = null; supabase = null;
+};
+
+const getCurrentConfig = () => ({ url: currentUrl, keySet: !!currentKey });
+
+export { supabase, isSupabaseConfigured, getSupabaseSummary, testSupabaseConnection, saveTicket, initSupabase, clearSupabaseConfig, getCurrentConfig };

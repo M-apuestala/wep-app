@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import TicketHipismo from './TicketHipismo.jsx';
 import TicketHipismoPrint from './TicketHipismoPrint.jsx';
 import TicketPreview from './TicketPreview.jsx';
-import { supabase, isSupabaseConfigured, getSupabaseSummary, testSupabaseConnection, saveTicket } from './supabaseClient.js';
+import { supabase, isSupabaseConfigured, getSupabaseSummary, testSupabaseConnection, saveTicket, initSupabase, getCurrentConfig, clearSupabaseConfig } from './supabaseClient.js';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 const Dashboard = () => {
@@ -22,6 +22,9 @@ const Dashboard = () => {
 
   const bufferMagnetico = useRef('');
   const ultimoKeypressTime = useRef(0);
+  const [showSupabaseConfig, setShowSupabaseConfig] = useState(false);
+  const [supabaseUrlInput, setSupabaseUrlInput] = useState('');
+  const [supabaseKeyInput, setSupabaseKeyInput] = useState('');
 
   const mostrarFeedback = (tipo, texto) => {
     setMensajeEstado({ tipo, texto });
@@ -93,6 +96,15 @@ const Dashboard = () => {
         if (mounted) setSupabaseStatus({ ok: false, detail: e.message || String(e) });
       }
     };
+
+    // initialize inputs from current config
+    try {
+      const cfg = getCurrentConfig();
+      if (cfg) {
+        setSupabaseUrlInput(cfg.url || '');
+        setSupabaseKeyInput(''); // don't prefill secret
+      }
+    } catch (e) {}
 
     check();
     const id = setInterval(check, 30000);
@@ -363,6 +375,9 @@ const Dashboard = () => {
               <span className="status-dot" style={{ background: supabaseStatus.ok ? '#34d399' : '#f97316' }} /> {supabaseStatus.ok ? 'Supabase: conectado' : 'Supabase: NO conectado'}
               <span style={{ marginLeft: 10, fontSize: 12, opacity: 0.9 }}>{autoSaveEnabled ? `Auto-save: ON${lastAutoSaveAt ? ' • ' + new Date(lastAutoSaveAt).toLocaleTimeString() : ''}` : 'Auto-save: OFF'}</span>
           </div>
+          <div style={{ marginLeft: 12 }}>
+            <button className="pill-button" type="button" onClick={() => setShowSupabaseConfig(v => !v)}>{showSupabaseConfig ? 'Cerrar Config' : 'Config Supabase'}</button>
+          </div>
           <button
             type="button"
             className="pill-button"
@@ -372,6 +387,28 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
+
+      {showSupabaseConfig && (
+        <div style={{ padding: 12, background: 'rgba(0,0,0,0.6)', margin: '12px 24px', borderRadius: 8 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <input placeholder="Supabase URL" value={supabaseUrlInput} onChange={e => setSupabaseUrlInput(e.target.value)} style={{ flex: '1 1 320px', padding: '8px 10px' }} />
+            <input placeholder="Anon Key" value={supabaseKeyInput} onChange={e => setSupabaseKeyInput(e.target.value)} style={{ flex: '1 1 320px', padding: '8px 10px' }} />
+            <button className="pill-button" onClick={async () => {
+              if (!supabaseUrlInput || !supabaseKeyInput) { mostrarFeedback('error', 'Rellena URL y Anon Key'); return; }
+              initSupabase(supabaseUrlInput.trim(), supabaseKeyInput.trim(), true);
+              const res = await testSupabaseConnection();
+              setSupabaseStatus({ ok: !!res.ok, detail: res.error || null });
+              if (res.ok) mostrarFeedback('success', 'Supabase configurado y probado correctamente'); else mostrarFeedback('error', 'Error conectando: ' + (res.error || 'sin respuesta'));
+            }}>Guardar y Probar</button>
+            <button className="pill-button" onClick={() => { clearSupabaseConfig(); setSupabaseUrlInput(''); setSupabaseKeyInput(''); setSupabaseStatus({ ok: false, detail: 'config cleared' }); mostrarFeedback('info','Configuración de Supabase eliminada'); }}>Borrar</button>
+          </div>
+          <div style={{ marginTop: 12, display: 'grid', gap: 8, fontSize: '0.98rem' }}>
+            <div><strong>Config actual:</strong> {supabaseUrlInput ? supabaseUrlInput : 'No configurada'}</div>
+            <div><strong>Anon key:</strong> {supabaseKeyInput ? 'Ingresada' : 'No ingresada'}</div>
+            <div><strong>Conexión:</strong> {supabaseStatus.ok ? 'Conectado' : `No conectado (${supabaseStatus.detail || 'sin respuesta'})`}</div>
+          </div>
+        </div>
+      )}
 
       <main className="main-content">
         <div className="header-row">
