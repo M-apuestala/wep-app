@@ -4,7 +4,7 @@ import TicketHipismo from './TicketHipismo.jsx';
 import TicketHipismoPrint from './TicketHipismoPrint.jsx';
 import TicketPreview from './TicketPreview.jsx';
 import { supabase, isSupabaseConfigured, getSupabaseSummary, testSupabaseConnection, saveTicket, initSupabase, getCurrentConfig, clearSupabaseConfig } from './supabaseClient.js';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5QrcodeScanner, Html5Qrcode } from 'html5-qrcode';
 
 const Dashboard = () => {
   const [datosTicket, setDatosTicket] = useState({ qr: '', magnetico: '', nfc: '' });
@@ -34,6 +34,22 @@ const Dashboard = () => {
     setTimeout(() => setMensajeEstado({ tipo: '', texto: '' }), 4000);
   };
 
+  // helper to attempt camera permission explicitly (available to UI)
+  const ensureCameraAccess = async () => {
+    if (!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+      mostrarFeedback('error', 'API de cámara no disponible en este navegador');
+      return false;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      stream.getTracks().forEach(t => t.stop());
+      return true;
+    } catch (e) {
+      console.warn('ensureCameraAccess failed', e);
+      return false;
+    }
+  };
+
   useEffect(() => {
     const manejarKeydownGlobal = (e) => {
       const ahora = Date.now();
@@ -58,9 +74,56 @@ const Dashboard = () => {
     return () => window.removeEventListener('keydown', manejarKeydownGlobal);
   }, []);
 
+  // load scanner preferences from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('scannerPrefs');
+      if (raw) {
+        const prefs = JSON.parse(raw);
+        setFlipX(!!prefs.flipX);
+        setFlipY(!!prefs.flipY);
+        setRotate90(!!prefs.rotate90);
+      }
+    } catch (e) {
+      console.warn('No se pudieron cargar preferencias del scanner', e);
+    }
+  }, []);
+
+  // save prefs on change
+  useEffect(() => {
+    try {
+      localStorage.setItem('scannerPrefs', JSON.stringify({ flipX, flipY, rotate90 }));
+    } catch (e) {
+      console.warn('No se pudieron guardar preferencias del scanner', e);
+    }
+  }, [flipX, flipY, rotate90]);
+
+  // apply CSS transform to camera video elements when flip/rotate change
+  useEffect(() => {
+    const applyTransforms = () => {
+      const container = document.getElementById('lector-qr');
+      if (!container) return;
+      const vids = container.querySelectorAll('video, canvas');
+      let t = '';
+      if (rotate90) t += ' rotate(90deg)';
+      if (flipX) t += ' scaleX(-1)';
+      if (flipY) t += ' scaleY(-1)';
+      vids.forEach(v => {
+        // ensure display block
+        v.style.transform = t || '';
+        v.style.webkitTransform = t || '';
+      });
+    };
+
+    // small timeout to allow the scanner to render video element
+    const id = setTimeout(applyTransforms, 120);
+    return () => clearTimeout(id);
+  }, [flipX, flipY, rotate90, escaneandoQR]);
+
   useEffect(() => {
     let scanner = null;
     let mounted = true;
+    
 
     const startScanner = async () => {
       try {
@@ -73,6 +136,19 @@ const Dashboard = () => {
         }
         // ensure container is empty
         container.innerHTML = '';
+
+        // Try to explicitly request camera permission first to ensure browser prompt
+        try {
+          if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            // immediately stop the acquired tracks; this was only to prompt permission
+            try { stream.getTracks().forEach(t => t.stop()); } catch (e) { /* ignore */ }
+          }
+        } catch (permErr) {
+          console.warn('[QR] getUserMedia permiso falló o fue denegado', permErr);
+          mostrarFeedback('error', 'Permiso de cámara denegado o no disponible');
+          // allow the Html5QrcodeScanner to still try, but inform user
+        }
 
         scanner = new Html5QrcodeScanner('lector-qr', {
           fps: 15,
@@ -390,6 +466,20 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {!supabaseStatus.ok && (
+        <div className="alert-banner" style={{ background: '#3b1717', color: '#ffdede', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>❌ Conexión a Supabase caída o no configurada. Algunos guardados pueden fallar.</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="button-secondary" onClick={() => setShowSupabaseConfig(true)}>Configurar</button>
+            <button className="button-outline" onClick={async () => {
+              const res = await testSupabaseConnection();
+              setSupabaseStatus({ ok: !!res.ok, detail: res.error || null });
+              mostrarFeedback(res.ok ? 'success' : 'error', res.ok ? 'Supabase conectado' : 'Sigue sin conexión');
+            }}>Reintentar</button>
+          </div>
+        </div>
+      )}
+
       <main className="page-shell">
         <div className="hero-top-centered">
           <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBby3qyaYen6cS0lvzOxw9CXesT7C1sKKgCRNXaaBnv243dAr7rUtkCQHYVp-7SWCWfZ4hNXzlQ-x5smEdKY9EssXWFAfCOEToahQAQSYlzdgNRw4yO_MTwgA_mzBpmgKxVaNLlOnH8nMQD5IcsdIGSQ4bZgjcBveUJ8xyZP1BaGqhLdTtXQ89SeuAL6cVMvPzFYgCMRMqaex9dQ-oIyDYMBfmtvn2kwSbrpXePFO-wcB7RpmEzsZoTzPv5ZriHqs3xs1aEScQ4RUw5" alt="Apuestala Logo" className="hero-logo" />
@@ -511,12 +601,31 @@ const Dashboard = () => {
                   <span className="material-symbols-outlined">center_focus_strong</span>
                   <p>Esperando señal...</p>
                 </div>
+                <div id="lector-qr" className="lector-qr" style={{ width: '100%', minHeight: 200, marginTop: 12 }} />
               </div>
 
-              <button className="button-primary" type="button" onClick={() => setEscaneandoQR(true)}>
-                <span className="material-symbols-outlined">videocam</span>
-                ACTIVAR ESCÁNER
-              </button>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <button className="button-primary" type="button" onClick={async () => {
+                  const ok = await ensureCameraAccess();
+                  if (!ok) { mostrarFeedback('error', 'Necesitas permitir la cámara para usar el escáner'); return; }
+                  setEscaneandoQR(true);
+                }}>
+                  <span className="material-symbols-outlined">videocam</span>
+                  ACTIVAR ESCÁNER
+                </button>
+                <button className="button-secondary" type="button" onClick={async () => {
+                  const ok = await ensureCameraAccess();
+                  if (ok) mostrarFeedback('success', 'Permiso de cámara concedido');
+                  else mostrarFeedback('error', 'Permiso de cámara no concedido');
+                }}>
+                  <span className="material-symbols-outlined">camera_alt</span>
+                  PEDIR PERMISO
+                </button>
+                <button className="button-outline" type="button" onClick={() => { setEscaneandoQR(false); setTimeout(()=>setEscaneandoQR(true), 220); }}>
+                  <span className="material-symbols-outlined">restart_alt</span>
+                  REINTENTAR
+                </button>
+              </div>
             </section>
 
             <section className="bento-card compact-card">
