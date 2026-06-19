@@ -353,170 +353,152 @@ const Dashboard = () => {
 
   return (
     <div className="app-root">
-      <div className="topbar">
-        <div className="topbar-left">
-          <div className="brand-header">
-            <div className="brand-mark">
-              <svg width="36" height="36" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Apuestala">
-                <rect width="120" height="120" rx="24" fill="#0f172a" />
-                <path d="M34 42L60 82L86 42" stroke="#fff" strokeWidth="14" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M44 62L60 42L76 62" stroke="#fff" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+      <header className="app-header">
+        <div>
+          <p className="eyebrow">Apuestala POS</p>
+          <h1 className="app-title">Dashboard central</h1>
+        </div>
+        <div className="header-meta">
+          <span className="status-badge">WEB APP MODE</span>
+          <div className="status-chip">
+            <span className="status-dot" />
+            {supabaseStatus.ok ? 'Sincronizado' : `Sincronizado: ${supabaseStatus.detail || 'sin respuesta'}`}
+          </div>
+        </div>
+      </header>
+
+      <main className="page-shell">
+        <section className="hero-card">
+          <div className="hero-card-top">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBby3qyaYen6cS0lvzOxw9CXesT7C1sKKgCRNXaaBnv243dAr7rUtkCQHYVp-7SWCWfZ4hNXzlQ-x5smEdKY9EssXWFAfCOEToahQAQSYlzdgNRw4yO_MTwgA_mzBpmgKxVaNLlOnH8nMQD5IcsdIGSQ4bZgjcBveUJ8xyZP1BaGqhLdTtXQ89SeuAL6cVMvPzFYgCMRMqaex9dQ-oIyDYMBfmtvn2kwSbrpXePFO-wcB7RpmEzsZoTzPv5ZriHqs3xs1aEScQ4RUw5" alt="Apuestala Logo" className="hero-logo" />
             <div>
-              <p className="eyebrow">Deploy 12</p>
-              <h1 className="title">Apuestala POS Dashboard</h1>
+              <p className="eyebrow">Gestión de apuestas</p>
+              <h2 className="hero-title">Terminal inteligente POS</h2>
             </div>
           </div>
-        </div>
 
-        <div className="topbar-right">
-          <div className="status-pill">
-              <span className="status-dot" style={{ background: supabaseStatus.ok ? '#34d399' : '#f97316' }} /> {supabaseStatus.ok ? 'Supabase: conectado' : 'Supabase: NO conectado'}
-              <span style={{ marginLeft: 10, fontSize: 12, opacity: 0.9 }}>{autoSaveEnabled ? `Auto-save: ON${lastAutoSaveAt ? ' • ' + new Date(lastAutoSaveAt).toLocaleTimeString() : ''}` : 'Auto-save: OFF'}</span>
-          </div>
-          <div style={{ marginLeft: 12 }}>
-            <button className="pill-button" type="button" onClick={() => setShowSupabaseConfig(v => !v)}>{showSupabaseConfig ? 'Cerrar Config' : 'Config Supabase'}</button>
-          </div>
-          <button
-            type="button"
-            className="pill-button"
-            onClick={() => window.open('/#/print/ticket-hipico', '_blank')}
-          >
-            Abrir Ticket Hípico (Imprimir)
-          </button>
-        </div>
-      </div>
-
-      {showSupabaseConfig && (
-        <div style={{ padding: 12, background: 'rgba(0,0,0,0.6)', margin: '12px 24px', borderRadius: 8 }}>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <input placeholder="Supabase URL" value={supabaseUrlInput} onChange={e => setSupabaseUrlInput(e.target.value)} style={{ flex: '1 1 320px', padding: '8px 10px' }} />
-            <input placeholder="Anon Key" value={supabaseKeyInput} onChange={e => setSupabaseKeyInput(e.target.value)} style={{ flex: '1 1 320px', padding: '8px 10px' }} />
-            <button className="pill-button" onClick={async () => {
-              if (!supabaseUrlInput || !supabaseKeyInput) { mostrarFeedback('error', 'Rellena URL y Anon Key'); return; }
-              initSupabase(supabaseUrlInput.trim(), supabaseKeyInput.trim(), true);
-              const res = await testSupabaseConnection();
-              setSupabaseStatus({ ok: !!res.ok, detail: res.error || null });
-              if (res.ok) mostrarFeedback('success', 'Supabase configurado y probado correctamente'); else mostrarFeedback('error', 'Error conectando: ' + (res.error || 'sin respuesta'));
-            }}>Guardar y Probar</button>
-            <button className="pill-button" onClick={() => { clearSupabaseConfig(); setSupabaseUrlInput(''); setSupabaseKeyInput(''); setSupabaseStatus({ ok: false, detail: 'config cleared' }); mostrarFeedback('info','Configuración de Supabase eliminada'); }}>Borrar</button>
-          </div>
-          <div style={{ marginTop: 12, display: 'grid', gap: 8, fontSize: '0.98rem' }}>
-            <div><strong>Config actual:</strong> {supabaseUrlInput ? supabaseUrlInput : 'No configurada'}</div>
-            <div><strong>Anon key:</strong> {supabaseKeyInput ? 'Ingresada' : 'No ingresada'}</div>
-            <div><strong>Conexión:</strong> {supabaseStatus.ok ? 'Conectado' : `No conectado (${supabaseStatus.detail || 'sin respuesta'})`}</div>
-          </div>
-        </div>
-      )}
-
-      <main className="main-content">
-        <div className="header-row">
-          <div>
-            <p className="eyebrow">Panel central</p>
-            <h2 className="headline">Mantén el frontend del deploy 12 y sigue trabajando con tus tickets.</h2>
-          </div>
-          <div className="header-actions">
-            <button className="pill-button" type="button" onClick={() => setEscaneandoQR(true)}>
-              Escanear QR
+          <div className="hero-actions">
+            <button className="button-secondary" type="button" onClick={preSaveAndOpenPreview}>
+              <span className="material-symbols-outlined">history</span>
+              Historial
             </button>
-            <button className="pill-button" type="button" onClick={limpiarFormulario}>
-              Reiniciar datos
+            <button className="button-secondary" type="button" onClick={procesarEImprimirTicket}>
+              <span className="material-symbols-outlined">refresh</span>
+              Refrescar
             </button>
           </div>
-        </div>
+        </section>
 
-        {mensajeEstado.texto && (
-          <div className="bento-card small-card">
-            <p>{mensajeEstado.texto}</p>
-          </div>
-        )}
-
-        <div className="grid-layout">
-          <div className="grid-left">
-            <section className="bento-card big-card">
-              <p className="eyebrow">Terminal POS</p>
-              <div className="stats-card">
-                <p><strong>QR capturado:</strong> {datosTicket.qr || 'Ninguno'}</p>
-                <p><strong>Banda magnética:</strong> {datosTicket.magnetico || 'Ninguna'}</p>
-                <p><strong>Tag NFC:</strong> {datosTicket.nfc || 'Ninguno'}</p>
-              </div>
-
-              <div className="header-actions" style={{ marginTop: '20px', gap: '12px', flexWrap: 'wrap' }}>
-                {(() => {
-                  const hasCaptured = !!(datosTicket.qr || datosTicket.magnetico || datosTicket.nfc);
-                  return (
-                    <>
-                      <button className="pill-button" type="button" onClick={preSaveAndOpenPreview} disabled={!hasCaptured}>
-                        Vista previa
-                      </button>
-                      <button className="pill-button" type="button" onClick={() => window.open('/#/print/ticket-hipico', '_blank')} disabled={!hasCaptured}>
-                        Ticket Hípico (Imprimir)
-                      </button>
-                      <button className="pill-button" type="button" onClick={procesarEImprimirTicket} disabled={guardando || !hasCaptured}>
-                        {guardando ? 'Guardando...' : 'Imprimir ticket'}
-                      </button>
-                    </>
-                  );
-                })()}
-              </div>
-            </section>
-
-            <section className="bento-card small-card">
-              <p className="eyebrow">Escáner QR</p>
-              {escaneandoQR ? (
-                <div id="lector-qr" style={{ minHeight: '260px', borderRadius: '20px', overflow: 'hidden' }} />
-              ) : (
-                <p style={{ color: 'var(--text-muted)', marginTop: '12px' }}>
-                  Pulsa el botón para iniciar la cámara y leer el QR.
-                </p>
-              )}
-            </section>
-
-            <section className="bento-card small-card">
-              <p className="eyebrow">Tag NFC</p>
-              <input
-                type="text"
-                placeholder="Acerca o escribe el tag NFC"
-                value={datosTicket.nfc}
-                onChange={(e) => setDatosTicket(prev => ({ ...prev, nfc: e.target.value }))}
-                style={{
-                  width: '100%',
-                  padding: '16px',
-                  borderRadius: '16px',
-                  border: '1px solid rgba(170, 137, 135, 0.2)',
-                  background: 'rgba(30, 16, 15, 0.9)',
-                  color: 'inherit',
-                  marginTop: '12px'
-                }}
-              />
-            </section>
-          </div>
-
-          <aside className="grid-right">
-            <section className="bento-card stats-card">
-              <p className="eyebrow">Indicadores</p>
-              <div style={{ display: 'grid', gap: '16px', marginTop: '18px' }}>
-                <div className="bento-card small-card" style={{ padding: '18px' }}>
-                  <p className="eyebrow">Estado</p>
-                  <p>{supabaseStatus.ok ? 'Supabase conectado' : `Supabase ERROR: ${supabaseStatus.detail || 'sin respuesta'}`}</p>
+        <div className="dashboard-grid">
+          <div className="dashboard-main-panel">
+            <section className="bento-card card-splash">
+              <div className="hero-intro">
+                <div className="hero-icon">
+                  <span className="material-symbols-outlined">qr_code_scanner</span>
                 </div>
-                <div className="bento-card small-card" style={{ padding: '18px' }}>
-                  <p className="eyebrow">Tickets hoy</p>
-                  <p>{datosTicket.qr || datosTicket.magnetico || datosTicket.nfc ? '1+' : '0'}</p>
+                <div>
+                  <h3>Validación de Tickets QR</h3>
+                  <p>Escanea con la cámara integrada para validar y procesar apuestas al instante, con soporte entero para registro y rendimiento.</p>
+                </div>
+              </div>
+
+              <div className="scan-preview">
+                <div className="scan-artwork" />
+                <div className="scan-overlay">
+                  <span className="material-symbols-outlined">center_focus_strong</span>
+                  <p>Esperando señal...</p>
+                </div>
+              </div>
+
+              <button className="button-primary" type="button" onClick={() => setEscaneandoQR(true)}>
+                <span className="material-symbols-outlined">videocam</span>
+                ACTIVAR ESCÁNER
+              </button>
+            </section>
+
+            <section className="action-strip">
+              <button className="button-gold" type="button" onClick={procesarEImprimirTicket}>
+                <span className="material-symbols-outlined">print_connect</span>
+                PROCESAR E IMPRIMIR COMPROBANTE
+              </button>
+              <button className="button-outline" type="button" onClick={limpiarFormulario}>
+                <span className="material-symbols-outlined">delete_sweep</span>
+                LIMPIAR
+              </button>
+            </section>
+          </div>
+
+          <aside className="dashboard-side-panel">
+            <section className="bento-card compact-card">
+              <div className="panel-heading">
+                <div className="panel-icon">
+                  <span className="material-symbols-outlined">credit_card</span>
+                </div>
+                <div>
+                  <h4>Lector de Banda</h4>
+                </div>
+              </div>
+              <div className="reader-panel">
+                <div className="reader-icon">
+                  <span className="material-symbols-outlined">swipe_vertical</span>
+                </div>
+                <p>Deslice la tarjeta por el canal lateral del dispositivo para iniciar cobro.</p>
+              </div>
+              <div className="reader-status">
+                <span className="status-label">Estado del lector</span>
+                <div className="status-indicator">
+                  <span className="status-dot status-dot--active" />
+                  <span>LISTO</span>
                 </div>
               </div>
             </section>
 
-            <section className="bento-card small-card">
-              <p className="eyebrow">Estado</p>
-              <div style={{ minHeight: '120px', padding: '16px', border: '1px solid rgba(170, 137, 135, 0.15)', borderRadius: '18px', color: 'var(--text-muted)' }}>
-                {mensajeEstado.texto || 'Aquí aparecerán los avisos rápidos del sistema.'}
+            <section className="bento-card compact-card">
+              <div className="panel-heading">
+                <div className="panel-icon">
+                  <span className="material-symbols-outlined">contactless</span>
+                </div>
+                <div>
+                  <h4>Procesador NFC</h4>
+                </div>
+              </div>
+              <div className="input-group">
+                <input
+                  placeholder="ID de Tag NFC o escaneo..."
+                  type="text"
+                  value={datosTicket.nfc}
+                  onChange={(e) => setDatosTicket(prev => ({ ...prev, nfc: e.target.value }))}
+                />
+                <span className="material-symbols-outlined input-icon">sensors</span>
+              </div>
+              <div className="info-box">
+                <span className="material-symbols-outlined">info</span>
+                <p>Compatible con chips NTAG213-216. El sistema detecta el acercamiento automáticamente.</p>
+              </div>
+            </section>
+
+            <section className="bento-card compact-card stats-summary">
+              <p className="eyebrow">Rendimiento de Sesión</p>
+              <div className="summary-row">
+                <span>Operaciones</span>
+                <strong>142 tickets</strong>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-fill" />
+              </div>
+              <div className="summary-row summary-row--muted">
+                <span>Cuota diaria</span>
+                <span>75% completado</span>
               </div>
             </section>
           </aside>
         </div>
+
+        <footer className="app-footer">
+          <p className="eyebrow">Apuestala Web Dashboard • Enterprise Secure Portal • Terminal #402-A9</p>
+        </footer>
       </main>
+
       {previewOpen && (
         <TicketPreview
           apuesta={apuestaPreview}
